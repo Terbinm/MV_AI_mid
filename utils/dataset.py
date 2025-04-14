@@ -9,6 +9,7 @@ import pandas as pd
 import cv2
 from tensorflow.keras.utils import Sequence
 import albumentations as A
+from sklearn.model_selection import train_test_split
 
 
 class DatasetProcessor:
@@ -78,6 +79,129 @@ class DatasetProcessor:
 
         return self.df
 
+    def balance_dataset(self, max_samples=None, balance_ratio=0.5, strategy='hybrid', random_state=42):
+        """
+        平衡資料集中的正常和錯誤樣本
+
+        Args:
+            max_samples: 最大樣本數量，None表示不限制
+            balance_ratio: 錯誤樣本佔總樣本的比例 (0.0-1.0)
+            strategy: 平衡策略 ('undersample', 'oversample', 'hybrid')
+            random_state: 隨機種子
+
+        Returns:
+            平衡後的DataFrame
+        """
+        # 確保錯誤標籤存在
+        if 'error_label' not in self.df.columns:
+            self.create_error_labels()
+
+        # 分離正常和錯誤樣本
+        normal_df = self.df[self.df['error_label'] == 0]
+        error_df = self.df[self.df['error_label'] == 1]
+
+        normal_count = len(normal_df)
+        error_count = len(error_df)
+
+        print(f"原始分布:")
+        print(f"  - 正常樣本: {normal_count} ({normal_count / len(self.df) * 100:.2f}%)")
+        print(f"  - 錯誤樣本: {error_count} ({error_count / len(self.df) * 100:.2f}%)")
+
+        # 設置隨機種子
+        np.random.seed(random_state)
+
+        # 根據不同策略平衡資料集
+        if strategy == 'undersample':
+            # 下採樣策略：基於少數類別(正常樣本)的數量，對多數類別進行下採樣
+            target_error_count = int(normal_count / (1 - balance_ratio) * balance_ratio)
+            target_error_count = min(target_error_count, error_count)
+            target_normal_count = normal_count
+
+            # 最大樣本數限制
+            if max_samples and target_normal_count + target_error_count > max_samples:
+                ratio = max_samples / (target_normal_count + target_error_count)
+                target_normal_count = int(target_normal_count * ratio)
+                target_error_count = int(target_error_count * ratio)
+
+            # 抽樣
+            if target_normal_count < normal_count:
+                sampled_normal = normal_df.sample(target_normal_count, random_state=random_state)
+            else:
+                sampled_normal = normal_df
+
+            sampled_error = error_df.sample(target_error_count, random_state=random_state)
+
+        elif strategy == 'oversample':
+            # 過採樣策略：基於多數類別(錯誤樣本)的數量，對少數類別進行過採樣
+            target_normal_count = int(error_count / balance_ratio * (1 - balance_ratio))
+            target_error_count = error_count
+
+            # 最大樣本數限制
+            if max_samples and target_normal_count + target_error_count > max_samples:
+                ratio = max_samples / (target_normal_count + target_error_count)
+                target_normal_count = int(target_normal_count * ratio)
+                target_error_count = int(target_error_count * ratio)
+
+            # 抽樣 - 對少數類進行放回抽樣
+            if target_normal_count > normal_count:
+                # 過採樣：放回抽樣
+                indices = np.random.choice(normal_df.index, size=target_normal_count, replace=True)
+                sampled_normal = normal_df.loc[indices].reset_index(drop=True)
+            else:
+                sampled_normal = normal_df.sample(target_normal_count, random_state=random_state)
+
+            sampled_error = error_df.sample(target_error_count, random_state=random_state)
+
+        elif strategy == 'hybrid':
+            # 混合策略：同時下採樣多數類和過採樣少數類
+            # 計算理想的平衡後總樣本數
+            if max_samples is None:
+                # 預設使用現有樣本數的一半
+                target_total = len(self.df) // 2
+            else:
+                target_total = max_samples
+
+            # 計算平衡後的錯誤和正常樣本數
+            target_error_count = int(target_total * balance_ratio)
+            target_normal_count = target_total - target_error_count
+
+            # 抽樣
+            if target_normal_count <= normal_count:
+                # 正常樣本不需要過採樣
+                sampled_normal = normal_df.sample(target_normal_count, random_state=random_state)
+            else:
+                # 正常樣本需要過採樣
+                indices = np.random.choice(normal_df.index, size=target_normal_count, replace=True)
+                sampled_normal = normal_df.loc[indices].reset_index(drop=True)
+
+            if target_error_count <= error_count:
+                # 錯誤樣本不需要過採樣
+                sampled_error = error_df.sample(target_error_count, random_state=random_state)
+            else:
+                # 錯誤樣本需要過採樣
+                indices = np.random.choice(error_df.index, size=target_error_count, replace=True)
+                sampled_error = error_df.loc[indices].reset_index(drop=True)
+
+        else:
+            raise ValueError(f"不支援的平衡策略: {strategy}")
+
+        # 合併並打亂順序
+        balanced_df = pd.concat([sampled_normal, sampled_error])
+        balanced_df = balanced_df.sample(frac=1, random_state=random_state).reset_index(drop=True)
+
+        # 分析平衡後的分布
+        normal_count = (balanced_df['error_label'] == 0).sum()
+        error_count = (balanced_df['error_label'] == 1).sum()
+
+        print(f"平衡後分布 (策略: {strategy}):")
+        print(f"  - 正常樣本: {normal_count} ({normal_count / len(balanced_df) * 100:.2f}%)")
+        print(f"  - 錯誤樣本: {error_count} ({error_count / len(balanced_df) * 100:.2f}%)")
+        print(f"  - 總樣本數: {len(balanced_df)}")
+
+        # 更新處理器的DataFrame
+        self.df = balanced_df
+        return balanced_df
+
     def split_train_val(self, val_ratio=0.2, random_state=42):
         """
         分割訓練集和驗證集
@@ -94,14 +218,15 @@ class DatasetProcessor:
             self.create_error_labels()
 
         # 分層抽樣，確保錯誤/正常樣本在訓練和驗證集中的比例一致
-        from sklearn.model_selection import train_test_split
-
-        train_indices, val_indices = train_test_split(
-            self.df.index,
+        train_df, val_df = train_test_split(
+            self.df,
             test_size=val_ratio,
             random_state=random_state,
             stratify=self.df['error_label']
         )
+
+        train_indices = train_df.index.tolist()
+        val_indices = val_df.index.tolist()
 
         print(f"訓練集大小: {len(train_indices)}, 驗證集大小: {len(val_indices)}")
 
@@ -118,6 +243,17 @@ class DatasetProcessor:
         val_indices_df.to_csv(val_path, index=False)
 
         print(f"索引檔案已保存至 {train_path} 和 {val_path}")
+
+        # 分析訓練集和驗證集的分布
+        train_normal = (self.df.loc[train_indices]['error_label'] == 0).sum()
+        train_error = (self.df.loc[train_indices]['error_label'] == 1).sum()
+        val_normal = (self.df.loc[val_indices]['error_label'] == 0).sum()
+        val_error = (self.df.loc[val_indices]['error_label'] == 1).sum()
+
+        print(f"訓練集分布: 正常={train_normal} ({train_normal / len(train_indices) * 100:.2f}%), " +
+              f"錯誤={train_error} ({train_error / len(train_indices) * 100:.2f}%)")
+        print(f"驗證集分布: 正常={val_normal} ({val_normal / len(val_indices) * 100:.2f}%), " +
+              f"錯誤={val_error} ({val_error / len(val_indices) * 100:.2f}%)")
 
         return train_indices, val_indices
 
