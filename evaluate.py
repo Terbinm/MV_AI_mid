@@ -323,15 +323,21 @@ def evaluate_thresholds(model, val_generator, output_dir):
 
     # 繪製ROC曲線
     plt.figure(figsize=(10, 8))
+    # 修正：移除fontproperties參數，改為先繪製，再設置圖例
     plt.plot(fpr, tpr, color='darkorange', lw=2,
-             label=f'ROC曲線 (面積 = {roc_auc:.4f})', fontproperties=chinese_font)
+             label=f'ROC曲線 (面積 = {roc_auc:.4f})')
     plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
+
+    # 使用中文字體設置標籤和標題
     plt.xlabel('偽陽性率 (False Positive Rate)', fontproperties=chinese_font)
     plt.ylabel('真陽性率 (True Positive Rate)', fontproperties=chinese_font)
     plt.title('接收者操作特徵曲線 (ROC)', fontproperties=chinese_font)
-    plt.legend(loc="lower right")
+
+    # 設置圖例，並為圖例指定中文字體
+    legend = plt.legend(loc="lower right", prop=chinese_font)
+
     plt.grid(True)
     plt.savefig(os.path.join(output_dir, "roc_curve.png"), dpi=300, bbox_inches='tight')
     plt.close()
@@ -361,15 +367,19 @@ def evaluate_thresholds(model, val_generator, output_dir):
 
     # 繪製不同閾值下的性能變化
     plt.figure(figsize=(12, 8))
-    plt.plot(df_results['threshold'], df_results['accuracy'], 'o-', label='準確率', fontproperties=chinese_font)
-    plt.plot(df_results['threshold'], df_results['precision'], 'o-', label='精確度', fontproperties=chinese_font)
-    plt.plot(df_results['threshold'], df_results['recall'], 'o-', label='召回率', fontproperties=chinese_font)
-    plt.plot(df_results['threshold'], df_results['f1_score'], 'o-', label='F1分數', fontproperties=chinese_font)
+    plt.plot(df_results['threshold'], df_results['accuracy'], 'o-', label='準確率')
+    plt.plot(df_results['threshold'], df_results['precision'], 'o-', label='精確度')
+    plt.plot(df_results['threshold'], df_results['recall'], 'o-', label='召回率')
+    plt.plot(df_results['threshold'], df_results['f1_score'], 'o-', label='F1分數')
+
     plt.xlabel('閾值', fontproperties=chinese_font)
     plt.ylabel('指標值', fontproperties=chinese_font)
     plt.title('不同閾值下的模型性能', fontproperties=chinese_font)
     plt.grid(True)
-    plt.legend()
+
+    # 同樣修改圖例設置方式
+    legend = plt.legend(prop=chinese_font)
+
     plt.savefig(os.path.join(output_dir, "threshold_performance.png"), dpi=300, bbox_inches='tight')
     plt.close()
 

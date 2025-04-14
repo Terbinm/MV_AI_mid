@@ -22,6 +22,7 @@ from utils.metrics import evaluate_model, visualize_predictions
 from utils.visualization import create_error_visualization_video
 from utils.font_utils import chinese_font
 
+
 def load_trained_model(model_path):
     """
     載入訓練好的模型
@@ -34,10 +35,14 @@ def load_trained_model(model_path):
     """
     print(f"載入模型: {model_path}")
 
-    # 載入自定義指標
+    # 載入自定義指標和損失函數
+    from models.unet import dice_coef, iou_coef, dice_loss, combined_loss
+
     custom_objects = {
-        'dice_coefficient': dice_coefficient,
-        'iou_coefficient': iou_coefficient
+        'dice_coefficient': dice_coef,
+        'iou_coefficient': iou_coef,
+        'dice_loss': dice_loss,  # 添加損失函數
+        'combined_loss': combined_loss  # 添加損失函數
     }
 
     try:
