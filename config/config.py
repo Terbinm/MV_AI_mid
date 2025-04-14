@@ -21,14 +21,14 @@ class Config:
 
         # 資料集配置
         self.CSV_FILE = 'caxton_dataset_filtered_no_outliers_img_info.csv'  # 主要資料集CSV檔案
-        # self.RAW_DATA_DIR = os.path.join(self.DATA_DIR, 'raw')
         self.RAW_DATA_DIR = os.path.join(self.DATA_DIR, 'limited_data_size')
         self.PROCESSED_DATA_DIR = os.path.join(self.DATA_DIR, 'processed')
 
         # 資料處理參數
-        self.MAX_SAMPLES = 100000  # 最大樣本數，None表示使用全部資料
+        self.MAX_SAMPLES = 10000  # 最大樣本數，None表示使用全部資料
         self.BALANCE_DATASET = True  # 是否平衡正負樣本
-        self.BALANCE_RATIO = 0.5  # 錯誤樣本比例
+        self.BALANCE_RATIO = 0.5  # 錯誤樣本比例 (0.5表示錯誤和正常樣本各佔一半)
+        self.BALANCE_STRATEGY = 'hybrid'  # 平衡策略: 'undersample', 'oversample', 'hybrid'
         self.VAL_RATIO = 0.2  # 驗證集比例
         self.CROP_SIZE = 320  # 裁剪尺寸
         self.RESIZE = 224  # 調整大小
@@ -39,7 +39,7 @@ class Config:
         self.NUM_CLASSES = 1  # 二元分割
         self.BASE_FILTERS = 32  # 基礎卷積濾波器數量
         self.DEPTH = 4  # U-Net深度
-        self.DROPOUT_RATE = 0.1  # Dropout比率
+        self.DROPOUT_RATE = 0.2  # Dropout比率 (增加防止過擬合)
         self.USE_BATCHNORM = True  # 是否使用批次正規化
 
         # 訓練參數
@@ -48,6 +48,7 @@ class Config:
         self.LEARNING_RATE = 1e-4  # 學習率
         self.LOSS_TYPE = 'bce_dice'  # 損失函數類型，可選: 'bce', 'dice', 'bce_dice'
         self.EARLY_STOPPING_PATIENCE = 10  # 提前停止耐心值
+        self.METRICS = ['accuracy', 'dice_coefficient', 'iou_coefficient']  # 評估指標
 
         # 預測參數
         self.THRESHOLD = 0.5  # 二值化閾值
