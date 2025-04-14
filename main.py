@@ -29,7 +29,8 @@ def display_menu():
     3. 模型評估
     4. 錯誤預測
     5. 觀察資料分布
-    6. 退出
+    6. 測試資料平衡策略
+    7. 退出
     """
     print(menu)
 
@@ -49,6 +50,30 @@ def process_data():
     if response.lower() == 'y':
         cleanup_processed_data(config, confirm=False)
 
+    # 詢問是否自訂平衡比例
+    customize_balance = input("是否自訂資料平衡參數? [y/N]: ")
+    if customize_balance.lower() == 'y':
+        # 設置平衡比例
+        try:
+            ratio = float(input(f"設置錯誤樣本比例 (0.0-1.0) [預設: {config.BALANCE_RATIO}]: "))
+            if 0.0 <= ratio <= 1.0:
+                config.BALANCE_RATIO = ratio
+        except ValueError:
+            print("使用預設值")
+
+        # 設置平衡策略
+        strategy = input(f"選擇平衡策略 (undersample/oversample/hybrid) [預設: {config.BALANCE_STRATEGY}]: ")
+        if strategy in ['undersample', 'oversample', 'hybrid']:
+            config.BALANCE_STRATEGY = strategy
+
+        # 設置最大樣本數
+        try:
+            max_samples = int(input(f"設置最大樣本數 [預設: {config.MAX_SAMPLES}]: "))
+            if max_samples > 0:
+                config.MAX_SAMPLES = max_samples
+        except ValueError:
+            print("使用預設值")
+
     # 執行預處理
     preprocess_all_data(config)
 
@@ -61,6 +86,44 @@ def train_model():
 
     # 引入訓練模組
     from train import train_model as start_training
+
+    # 載入配置
+    config = Config()
+
+    # 詢問是否自訂訓練參數
+    customize_training = input("是否自訂訓練參數? [y/N]: ")
+    if customize_training.lower() == 'y':
+        # 設置批次大小
+        try:
+            batch_size = int(input(f"設置批次大小 [預設: {config.BATCH_SIZE}]: "))
+            if batch_size > 0:
+                config.BATCH_SIZE = batch_size
+        except ValueError:
+            print("使用預設值")
+
+        # 設置訓練輪數
+        try:
+            epochs = int(input(f"設置訓練輪數 [預設: {config.EPOCHS}]: "))
+            if epochs > 0:
+                config.EPOCHS = epochs
+        except ValueError:
+            print("使用預設值")
+
+        # 設置學習率
+        try:
+            lr = float(input(f"設置學習率 [預設: {config.LEARNING_RATE}]: "))
+            if lr > 0:
+                config.LEARNING_RATE = lr
+        except ValueError:
+            print("使用預設值")
+
+        # 設置提前停止耐心值
+        try:
+            patience = int(input(f"設置提前停止耐心值 [預設: {config.EARLY_STOPPING_PATIENCE}]: "))
+            if patience > 0:
+                config.EARLY_STOPPING_PATIENCE = patience
+        except ValueError:
+            print("使用預設值")
 
     # 執行訓練
     try:
@@ -116,6 +179,23 @@ def evaluate_model():
         print("請輸入有效的數字")
         return
 
+    # 載入配置
+    config = Config()
+
+    # 詢問是否自訂閾值
+    customize_threshold = input("是否自訂二值化閾值? [y/N]: ")
+    threshold_value = None
+    if customize_threshold.lower() == 'y':
+        try:
+            threshold_value = float(input(f"設置閾值 (0.0-1.0) [預設: {config.THRESHOLD}]: "))
+            if 0.0 <= threshold_value <= 1.0:
+                print(f"使用自訂閾值: {threshold_value}")
+            else:
+                threshold_value = None
+                print("閾值超出範圍，使用默認值")
+        except ValueError:
+            print("無效輸入，使用默認值")
+
     # 建立評估命令並執行
     cmd = ["python", "evaluate.py", "--model", selected_model]
 
@@ -138,6 +218,10 @@ def evaluate_model():
 
     output_dir = os.path.join("results", "evaluation", f"eval_{os.path.basename(selected_model).split('.')[0]}")
     cmd.extend(["--output", output_dir])
+
+    # 加入閾值參數
+    if threshold_value is not None:
+        cmd.extend(["--threshold", str(threshold_value)])
 
     # 執行評估
     import subprocess
@@ -191,6 +275,23 @@ def predict_errors():
         print("請輸入有效的數字")
         return
 
+    # 載入配置
+    config = Config()
+
+    # 詢問是否自訂閾值
+    customize_threshold = input("是否自訂二值化閾值? [y/N]: ")
+    threshold_value = None
+    if customize_threshold.lower() == 'y':
+        try:
+            threshold_value = float(input(f"設置閾值 (0.0-1.0) [預設: {config.THRESHOLD}]: "))
+            if 0.0 <= threshold_value <= 1.0:
+                print(f"使用自訂閾值: {threshold_value}")
+            else:
+                threshold_value = None
+                print("閾值超出範圍，使用默認值")
+        except ValueError:
+            print("無效輸入，使用默認值")
+
     # 建立預測命令並執行
     cmd = ["python", "predict.py", "--model", selected_model]
 
@@ -223,6 +324,10 @@ def predict_errors():
     output_dir = os.path.join("results", "predictions", f"pred_{os.path.basename(selected_model).split('.')[0]}")
     cmd.extend(["--output", output_dir])
 
+    # 加入閾值參數
+    if threshold_value is not None:
+        cmd.extend(["--threshold", str(threshold_value)])
+
     # 詢問是否生成視覺化影片
     if mode_choice == 3:
         video_choice = input("生成視覺化影片? [Y/n]: ")
@@ -247,17 +352,33 @@ def explore_data():
     # 載入配置
     config = Config()
 
-    # 分析CSV檔案
-    csv_path = os.path.join(config.DATA_DIR, "limited_data_size", config.CSV_FILE)
-    if not os.path.exists(csv_path):
-        print(f"找不到CSV檔案: {csv_path}")
+    # 選擇CSV檔案
+    csv_files = list_csv_files()
+    if not csv_files:
+        print("沒有找到CSV檔案")
         return
 
+    print("\n可用CSV檔案:")
+    for i, csv_path in enumerate(csv_files):
+        print(f"{i + 1}. {os.path.basename(csv_path)}")
+
+    try:
+        choice = int(input("\n請選擇CSV檔案編號: "))
+        if choice < 1 or choice > len(csv_files):
+            print("無效的選擇")
+            return
+
+        selected_csv = csv_files[choice - 1]
+    except ValueError:
+        print("請輸入有效的數字")
+        return
+
+    # 分析CSV檔案
     output_dir = os.path.join(config.DATA_DIR, "plt", "data_exploration")
     os.makedirs(output_dir, exist_ok=True)
 
     # 分析CSV
-    stats = analyze_csv_data(csv_path, output_dir)
+    stats = analyze_csv_data(selected_csv, output_dir)
 
     # 抽樣並探索影像
     sample_choice = input("\n是否抽樣並探索影像? [y/N]: ")
@@ -271,13 +392,67 @@ def explore_data():
             print("使用預設值")
 
         sample_and_explore_images(
-            csv_path=csv_path,
+            csv_path=selected_csv,
             image_dir=config.DATA_DIR,
             output_dir=os.path.join(output_dir, "sample_images"),
             num_samples=num_samples
         )
 
     print(f"資料分析完成! 結果保存在: {output_dir}")
+
+
+def test_balance_strategies():
+    """測試不同的資料平衡策略"""
+    print("正在測試資料平衡策略...")
+
+    # 引入工具模組
+    from toolbox.balance_sample import test_different_strategies
+
+    # 載入配置
+    config = Config()
+
+    # 選擇CSV檔案
+    csv_files = list_csv_files()
+    if not csv_files:
+        print("沒有找到CSV檔案")
+        return
+
+    print("\n可用CSV檔案:")
+    for i, csv_path in enumerate(csv_files):
+        print(f"{i + 1}. {os.path.basename(csv_path)}")
+
+    try:
+        choice = int(input("\n請選擇CSV檔案編號: "))
+        if choice < 1 or choice > len(csv_files):
+            print("無效的選擇")
+            return
+
+        selected_csv = csv_files[choice - 1]
+    except ValueError:
+        print("請輸入有效的數字")
+        return
+
+    # 設置輸出目錄
+    output_dir = os.path.join(config.DATA_DIR, "balanced_test")
+    os.makedirs(output_dir, exist_ok=True)
+
+    # 設置最大樣本數
+    max_samples = config.MAX_SAMPLES
+    try:
+        max_input = input(f"設置最大樣本數 [預設: {max_samples}]: ")
+        if max_input:
+            max_samples = int(max_input)
+    except ValueError:
+        print("使用預設值")
+
+    # 執行測試
+    test_different_strategies(
+        csv_path=selected_csv,
+        output_dir=output_dir,
+        max_samples=max_samples
+    )
+
+    print(f"資料平衡策略測試完成! 結果保存在: {output_dir}")
 
 
 def list_available_models():
@@ -291,6 +466,29 @@ def list_available_models():
                 result_dirs.append(os.path.join(root, file))
 
     return result_dirs
+
+
+def list_csv_files():
+    """列出可用的CSV檔案"""
+    csv_files = []
+
+    # 載入配置
+    config = Config()
+
+    # 搜尋data目錄中的CSV檔案
+    data_dirs = [
+        os.path.join(config.DATA_DIR, "limited_data_size"),
+        os.path.join(config.DATA_DIR, "raw"),
+        config.DATA_DIR
+    ]
+
+    for data_dir in data_dirs:
+        if os.path.exists(data_dir):
+            for file in os.listdir(data_dir):
+                if file.endswith(".csv"):
+                    csv_files.append(os.path.join(data_dir, file))
+
+    return csv_files
 
 
 def main():
@@ -311,6 +509,7 @@ def main():
     parser.add_argument('--evaluate', action='store_true', help='執行模型評估')
     parser.add_argument('--predict', action='store_true', help='執行錯誤預測')
     parser.add_argument('--explore', action='store_true', help='觀察資料分布')
+    parser.add_argument('--balance', action='store_true', help='測試資料平衡策略')
 
     args = parser.parse_args()
 
@@ -330,6 +529,9 @@ def main():
     elif args.explore:
         explore_data()
         return
+    elif args.balance:
+        test_balance_strategies()
+        return
 
     # 如果沒有命令列引數，顯示互動式選單
     while True:
@@ -347,6 +549,8 @@ def main():
         elif choice == '5':
             explore_data()
         elif choice == '6':
+            test_balance_strategies()
+        elif choice == '7':
             print("感謝使用，再見!")
             sys.exit(0)
         else:

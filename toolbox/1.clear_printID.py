@@ -7,9 +7,9 @@ import numpy as np
 
 start_time = time.time()
 # 設定資料夾路徑
-input_dir = r"D:\led\MV_AI_mid\data\raw"
-output_dir = r"D:\led\MV_AI_mid\data\limited_data_size"
-plot_dir = r"D:\led\MV_AI_mid\data\plt"
+input_dir = r"C:\led_code\MV_AI_mid_ssd\data\raw"
+output_dir = r"C:\led_code\MV_AI_mid_ssd\data\limited_data_size"
+plot_dir = r"C:\led_code\MV_AI_mid_ssd\data\plt\printID"
 
 # 確保輸出目錄存在
 os.makedirs(output_dir, exist_ok=True)
@@ -93,19 +93,19 @@ for i, csv_file in enumerate(csv_files):
 
         # 預先建立一個dictionary將每一筆資料對應到其print編號，提高後續計算效率
         data_print_map = {}
-        for i, img_path in enumerate(img_paths):
+        for K, img_path in enumerate(img_paths):
             match = print_pattern.search(img_path)
             if match:
                 print_num = int(match.group(1))
-                data_print_map[i] = print_num
+                data_print_map[K] = print_num
 
         # 計算原始資料中各print編號的數量
         original_counts = {}
-        for i in all_print_numbers:
+        for J in all_print_numbers:
             # 使用提前計算的映射來統計
-            count = sum(1 for idx, print_num in data_print_map.items() if print_num == i)
-            original_counts[f'print{i}'] = count
-            print(f"原始資料中 print{i}/ 目錄資料筆數: {count}")
+            count = sum(1 for idx, print_num in data_print_map.items() if print_num == J)
+            original_counts[f'print{J}'] = count
+            print(f"原始資料中 print{J}/ 目錄資料筆數: {count}")
 
         # 正確設定篩選條件：使用一個合適的方法篩選資料
         # 創建一個篩選條件的布林陣列
@@ -124,18 +124,18 @@ for i, csv_file in enumerate(csv_files):
         # 計算過濾後的資料中各print編號的數量
         filtered_counts = {}
         # 只考慮小於等於max_print_num的編號
-        for i in range(max_print_num + 1):
-            if i in all_print_numbers:  # 確認這個編號在原始資料中存在
+        for M in range(max_print_num + 1):
+            if M in all_print_numbers:  # 確認這個編號在原始資料中存在
                 filtered_count = sum(1 for idx, print_num in data_print_map.items()
-                                     if print_num == i and idx in filtered_df.index)
-                filtered_counts[f'print{i}'] = filtered_count
-                print(f"過濾後資料中 print{i}/ 目錄資料筆數: {filtered_count}")
+                                     if print_num == M and idx in filtered_df.index)
+                filtered_counts[f'print{M}'] = filtered_count
+                print(f"過濾後資料中 print{M}/ 目錄資料筆數: {filtered_count}")
 
         # 繪製直方圖比較
         plt.figure(figsize=(14, 8))
 
         # 獲取所有print編號
-        all_prints = [f'print{i}' for i in all_print_numbers]
+        all_prints = [f'print{L}' for L in all_print_numbers]
         x = np.arange(len(all_prints))
         width = 0.35
 
@@ -166,17 +166,17 @@ for i, csv_file in enumerate(csv_files):
         plt.grid(axis='y', linestyle='--', alpha=0.7)
 
         # 在每個長條上標示數值
-        for i, v in enumerate(original_values):
+        for P, v in enumerate(original_values):
             if v > 0:  # 只有當有值時才標註
-                plt.text(i - width / 2, v + max_value * 0.01, f"{v}",
+                plt.text(P - width / 2, v + max_value * 0.01, f"{v}",
                          ha='center', va='bottom', fontsize=8, fontweight='bold')
 
         # 只標註過濾後有值的部分
-        for i, print_num in enumerate(all_print_numbers):
+        for Q, print_num in enumerate(all_print_numbers):
             if print_num <= max_print_num:
                 filtered_value = filtered_counts.get(f'print{print_num}', 0)
                 if filtered_value > 0:
-                    plt.text(i + width / 2, filtered_value + max_value * 0.01, f"{filtered_value}",
+                    plt.text(Q + width / 2, filtered_value + max_value * 0.01, f"{filtered_value}",
                              ha='center', va='bottom', fontsize=8, fontweight='bold')
 
         # 儲存圖表
