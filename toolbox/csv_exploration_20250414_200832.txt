@@ -1,0 +1,167 @@
+執行時間: 2025-04-14 20:08:32
+
+
+目錄結構 (最多顯示每個資料夾15個檔案):
+MV_AI_mid/
+    test.py
+    venv.md
+    config/
+        config.py
+    data/
+        limited_data_size/
+            limit_id_dataset_filtered.csv
+            limit_id_dataset_filtered_no_outliers.csv
+            limit_id_dataset_filtered_no_outliers_img_info.csv
+            limit_id_dataset_final.csv
+            limit_id_dataset_full.csv
+        plt/
+        processed/
+            train_indices.csv
+            val_indices.csv
+            train/
+                images/
+                masks/
+            val/
+        raw/
+            caxton_dataset_filtered.csv
+            caxton_dataset_filtered_no_outliers.csv
+            caxton_dataset_filtered_no_outliers_img_info.csv
+            caxton_dataset_final.csv
+            caxton_dataset_full.csv
+            caxton_dataset/
+                print0/
+                    image-0.jpg
+                    image-1.jpg
+                    image-10.jpg
+                    image-100.jpg
+                    image-1000.jpg
+                    image-1001.jpg
+                    image-1002.jpg
+                    image-1003.jpg
+                    image-1004.jpg
+                    image-1005.jpg
+                    image-1006.jpg
+                    image-1007.jpg
+                    image-1008.jpg
+                    image-1009.jpg
+                    image-101.jpg
+                    ... 還有 3075 個檔案未顯示
+                print29/
+                    image-0.jpg
+                    image-1.jpg
+                    image-10.jpg
+                    image-10009.jpg
+                    ... 還有 13661 個檔案未顯示
+    results/
+
+找到 5 個CSV檔案：
+- caxton_dataset_filtered.csv
+- caxton_dataset_filtered_no_outliers.csv
+- caxton_dataset_filtered_no_outliers_img_info.csv
+- caxton_dataset_final.csv
+- caxton_dataset_full.csv
+
+================================================================================
+檔案: caxton_dataset_filtered.csv
+================================================================================
+檔案大小: 122841.13 KB
+資料筆數: 1072500
+欄位數量: 16
+欄位名稱: img_path, timestamp, flow_rate, feed_rate, z_offset, target_hotend, hotend, bed, nozzle_tip_x, nozzle_tip_y, img_num, print_id, flow_rate_class, feed_rate_class, z_offset_class, hotend_class
+
+前10行資料:
+                             img_path               timestamp  flow_rate  feed_rate  z_offset  target_hotend  hotend    bed  nozzle_tip_x  nozzle_tip_y  img_num  print_id  flow_rate_class  feed_rate_class  z_offset_class  hotend_class
+0   caxton_dataset/print0/image-6.jpg  2020-10-08T13:12:50-34        100        100       0.0          205.0  204.13  65.74           531           554        5         0                1                1               1             1
+1   caxton_dataset/print0/image-7.jpg  2020-10-08T13:12:50-80        100        100       0.0          205.0  204.13  65.74           531           554        6         0                1                1               1             1
+2   caxton_dataset/print0/image-8.jpg  2020-10-08T13:12:51-27        100        100       0.0          205.0  204.24  65.84           531           554        7         0                1                1               1             1
+3   caxton_dataset/print0/image-9.jpg  2020-10-08T13:12:51-74        100        100       0.0          205.0  204.24  65.84           531           554        8         0                1                1               1             1
+4  caxton_dataset/print0/image-10.jpg  2020-10-08T13:12:52-20        100        100       0.0          205.0  204.24  65.84           531           554        9         0                1                1               1             1
+5  caxton_dataset/print0/image-11.jpg  2020-10-08T13:12:52-67        100        100       0.0          205.0  204.24  65.84           531           554       10         0                1                1               1             1
+6  caxton_dataset/print0/image-12.jpg  2020-10-08T13:12:53-12        100        100       0.0          205.0  204.41  65.77           531           554       11         0                1                1               1             1
+7  caxton_dataset/print0/image-13.jpg  2020-10-08T13:12:53-59        100        100       0.0          205.0  204.41  65.77           531           554       12         0                1                1               1             1
+8  caxton_dataset/print0/image-14.jpg  2020-10-08T13:12:54-05        100        100       0.0          205.0  204.41  65.77           531           554       13         0                1                1               1             1
+9  caxton_dataset/print0/image-15.jpg  2020-10-08T13:12:54-52        100        100       0.0          205.0  204.41  65.77           531           554       14         0                1                1               1             1
+
+================================================================================
+檔案: caxton_dataset_filtered_no_outliers.csv
+================================================================================
+檔案大小: 113396.90 KB
+資料筆數: 991103
+欄位數量: 16
+欄位名稱: img_path, timestamp, flow_rate, feed_rate, z_offset, target_hotend, hotend, bed, nozzle_tip_x, nozzle_tip_y, img_num, print_id, flow_rate_class, feed_rate_class, z_offset_class, hotend_class
+
+前10行資料:
+                             img_path               timestamp  flow_rate  feed_rate  z_offset  target_hotend  hotend    bed  nozzle_tip_x  nozzle_tip_y  img_num  print_id  flow_rate_class  feed_rate_class  z_offset_class  hotend_class
+0   caxton_dataset/print0/image-6.jpg  2020-10-08T13:12:50-34        100        100       0.0          205.0  204.13  65.74           531           554        5         0                1                1               1             1
+1   caxton_dataset/print0/image-7.jpg  2020-10-08T13:12:50-80        100        100       0.0          205.0  204.13  65.74           531           554        6         0                1                1               1             1
+2   caxton_dataset/print0/image-8.jpg  2020-10-08T13:12:51-27        100        100       0.0          205.0  204.24  65.84           531           554        7         0                1                1               1             1
+3   caxton_dataset/print0/image-9.jpg  2020-10-08T13:12:51-74        100        100       0.0          205.0  204.24  65.84           531           554        8         0                1                1               1             1
+4  caxton_dataset/print0/image-10.jpg  2020-10-08T13:12:52-20        100        100       0.0          205.0  204.24  65.84           531           554        9         0                1                1               1             1
+5  caxton_dataset/print0/image-11.jpg  2020-10-08T13:12:52-67        100        100       0.0          205.0  204.24  65.84           531           554       10         0                1                1               1             1
+6  caxton_dataset/print0/image-12.jpg  2020-10-08T13:12:53-12        100        100       0.0          205.0  204.41  65.77           531           554       11         0                1                1               1             1
+7  caxton_dataset/print0/image-13.jpg  2020-10-08T13:12:53-59        100        100       0.0          205.0  204.41  65.77           531           554       12         0                1                1               1             1
+8  caxton_dataset/print0/image-14.jpg  2020-10-08T13:12:54-05        100        100       0.0          205.0  204.41  65.77           531           554       13         0                1                1               1             1
+9  caxton_dataset/print0/image-15.jpg  2020-10-08T13:12:54-52        100        100       0.0          205.0  204.41  65.77           531           554       14         0                1                1               1             1
+
+================================================================================
+檔案: caxton_dataset_filtered_no_outliers_img_info.csv
+================================================================================
+檔案大小: 147870.46 KB
+資料筆數: 991103
+欄位數量: 18
+欄位名稱: img_path, timestamp, flow_rate, feed_rate, z_offset, target_hotend, hotend, bed, nozzle_tip_x, nozzle_tip_y, img_num, print_id, flow_rate_class, feed_rate_class, z_offset_class, hotend_class, img_mean, img_std
+
+前10行資料:
+                             img_path               timestamp  flow_rate  feed_rate  z_offset  target_hotend  hotend    bed  nozzle_tip_x  nozzle_tip_y  img_num  print_id  flow_rate_class  feed_rate_class  z_offset_class  hotend_class   img_mean    img_std
+0   caxton_dataset/print0/image-6.jpg  2020-10-08T13:12:50-34        100        100       0.0          205.0  204.13  65.74           531           554        5         0                1                1               1             1  18.687230  13.809311
+1   caxton_dataset/print0/image-7.jpg  2020-10-08T13:12:50-80        100        100       0.0          205.0  204.13  65.74           531           554        6         0                1                1               1             1  27.321104  22.875292
+2   caxton_dataset/print0/image-8.jpg  2020-10-08T13:12:51-27        100        100       0.0          205.0  204.24  65.84           531           554        7         0                1                1               1             1  23.138174  17.933411
+3   caxton_dataset/print0/image-9.jpg  2020-10-08T13:12:51-74        100        100       0.0          205.0  204.24  65.84           531           554        8         0                1                1               1             1  21.014212  17.120604
+4  caxton_dataset/print0/image-10.jpg  2020-10-08T13:12:52-20        100        100       0.0          205.0  204.24  65.84           531           554        9         0                1                1               1             1  27.481729  15.091996
+5  caxton_dataset/print0/image-11.jpg  2020-10-08T13:12:52-67        100        100       0.0          205.0  204.24  65.84           531           554       10         0                1                1               1             1  24.432734  13.388559
+6  caxton_dataset/print0/image-12.jpg  2020-10-08T13:12:53-12        100        100       0.0          205.0  204.41  65.77           531           554       11         0                1                1               1             1  20.286904  15.572808
+7  caxton_dataset/print0/image-13.jpg  2020-10-08T13:12:53-59        100        100       0.0          205.0  204.41  65.77           531           554       12         0                1                1               1             1  23.738685  19.798733
+8  caxton_dataset/print0/image-14.jpg  2020-10-08T13:12:54-05        100        100       0.0          205.0  204.41  65.77           531           554       13         0                1                1               1             1  20.335788  16.168532
+9  caxton_dataset/print0/image-15.jpg  2020-10-08T13:12:54-52        100        100       0.0          205.0  204.41  65.77           531           554       14         0                1                1               1             1  19.844967  19.351945
+
+================================================================================
+檔案: caxton_dataset_final.csv
+================================================================================
+檔案大小: 141412.25 KB
+資料筆數: 948396
+欄位數量: 18
+欄位名稱: img_path, timestamp, flow_rate, feed_rate, z_offset, target_hotend, hotend, bed, nozzle_tip_x, nozzle_tip_y, img_num, print_id, flow_rate_class, feed_rate_class, z_offset_class, hotend_class, img_mean, img_std
+
+前10行資料:
+                             img_path               timestamp  flow_rate  feed_rate  z_offset  target_hotend  hotend    bed  nozzle_tip_x  nozzle_tip_y  img_num  print_id  flow_rate_class  feed_rate_class  z_offset_class  hotend_class   img_mean    img_std
+0   caxton_dataset/print0/image-6.jpg  2020-10-08T13:12:50-34        100        100       0.0          205.0  204.13  65.74           531           554        5         0                1                1               1             1  18.687230  13.809311
+1   caxton_dataset/print0/image-7.jpg  2020-10-08T13:12:50-80        100        100       0.0          205.0  204.13  65.74           531           554        6         0                1                1               1             1  27.321104  22.875292
+2   caxton_dataset/print0/image-8.jpg  2020-10-08T13:12:51-27        100        100       0.0          205.0  204.24  65.84           531           554        7         0                1                1               1             1  23.138174  17.933411
+3   caxton_dataset/print0/image-9.jpg  2020-10-08T13:12:51-74        100        100       0.0          205.0  204.24  65.84           531           554        8         0                1                1               1             1  21.014212  17.120604
+4  caxton_dataset/print0/image-10.jpg  2020-10-08T13:12:52-20        100        100       0.0          205.0  204.24  65.84           531           554        9         0                1                1               1             1  27.481729  15.091996
+5  caxton_dataset/print0/image-11.jpg  2020-10-08T13:12:52-67        100        100       0.0          205.0  204.24  65.84           531           554       10         0                1                1               1             1  24.432734  13.388559
+6  caxton_dataset/print0/image-12.jpg  2020-10-08T13:12:53-12        100        100       0.0          205.0  204.41  65.77           531           554       11         0                1                1               1             1  20.286904  15.572808
+7  caxton_dataset/print0/image-13.jpg  2020-10-08T13:12:53-59        100        100       0.0          205.0  204.41  65.77           531           554       12         0                1                1               1             1  23.738685  19.798733
+8  caxton_dataset/print0/image-14.jpg  2020-10-08T13:12:54-05        100        100       0.0          205.0  204.41  65.77           531           554       13         0                1                1               1             1  20.335788  16.168532
+9  caxton_dataset/print0/image-15.jpg  2020-10-08T13:12:54-52        100        100       0.0          205.0  204.41  65.77           531           554       14         0                1                1               1             1  19.844967  19.351945
+
+================================================================================
+檔案: caxton_dataset_full.csv
+================================================================================
+檔案大小: 129323.03 KB
+資料筆數: 1272273
+欄位數量: 11
+欄位名稱: img_path, timestamp, flow_rate, feed_rate, z_offset, target_hotend, hotend, bed, nozzle_tip_x, nozzle_tip_y, print_id
+
+前10行資料:
+                             img_path               timestamp  flow_rate  feed_rate  z_offset  target_hotend  hotend    bed  nozzle_tip_x  nozzle_tip_y  print_id
+0   caxton_dataset/print0/image-1.jpg  2020-10-08T13:12:48-02        100        100       0.0          205.0  204.34  65.66           531           554         0
+1   caxton_dataset/print0/image-2.jpg  2020-10-08T13:12:48-48        100        100       0.0          205.0  204.34  65.66           531           554         0
+2   caxton_dataset/print0/image-3.jpg  2020-10-08T13:12:48-94        100        100       0.0          205.0  204.13  65.74           531           554         0
+3   caxton_dataset/print0/image-4.jpg  2020-10-08T13:12:49-41        100        100       0.0          205.0  204.13  65.74           531           554         0
+4   caxton_dataset/print0/image-5.jpg  2020-10-08T13:12:49-87        100        100       0.0          205.0  204.13  65.74           531           554         0
+5   caxton_dataset/print0/image-6.jpg  2020-10-08T13:12:50-34        100        100       0.0          205.0  204.13  65.74           531           554         0
+6   caxton_dataset/print0/image-7.jpg  2020-10-08T13:12:50-80        100        100       0.0          205.0  204.13  65.74           531           554         0
+7   caxton_dataset/print0/image-8.jpg  2020-10-08T13:12:51-27        100        100       0.0          205.0  204.24  65.84           531           554         0
+8   caxton_dataset/print0/image-9.jpg  2020-10-08T13:12:51-74        100        100       0.0          205.0  204.24  65.84           531           554         0
+9  caxton_dataset/print0/image-10.jpg  2020-10-08T13:12:52-20        100        100       0.0          205.0  204.24  65.84           531           554         0
