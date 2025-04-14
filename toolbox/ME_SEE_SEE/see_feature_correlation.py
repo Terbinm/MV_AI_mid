@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from scipy.spatial.distance import pdist, squareform
 
 # Load a sample of data to optimize performance
-csv_path = r"C:\led_code\MV_AI_mid_ssd\toolbox\temp\caxton_dataset_filtered_no_outliers_img_info.csv"
+csv_path = r"C:\led_code\MV_AI_mid_ssd\toolbox\ME_SEE_SEE\caxton_dataset_filtered_no_outliers_img_info.csv"
 sample_size = 10000  # You can adjust this based on available memory
 df = pd.read_csv(csv_path, usecols=["flow_rate", "feed_rate", "z_offset", "hotend"])
 df_sample = df.sample(n=sample_size, random_state=42)

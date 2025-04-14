@@ -10,7 +10,7 @@ from scipy.cluster.hierarchy import linkage, dendrogram
 from sklearn.cluster import AgglomerativeClustering
 
 # 設定路徑 & 取樣
-csv_path = r"C:\led_code\MV_AI_mid_ssd\toolbox\temp\caxton_dataset_filtered_no_outliers_img_info.csv"
+csv_path = r"C:\led_code\MV_AI_mid_ssd\toolbox\ME_SEE_SEE\caxton_dataset_filtered_no_outliers_img_info.csv"
 sample_size = 5000  # 根據電腦記憶體大小可調整
 df = pd.read_csv(csv_path, usecols=["flow_rate", "feed_rate", "z_offset", "hotend"])
 df_sample = df.sample(n=sample_size, random_state=42)

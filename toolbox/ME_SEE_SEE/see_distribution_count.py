@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # CSV 路徑
-csv_path = r"C:\led_code\MV_AI_mid_ssd\toolbox\temp\caxton_dataset_filtered_no_outliers_img_info.csv"
+csv_path = r"C:\led_code\MV_AI_mid_ssd\toolbox\ME_SEE_SEE\caxton_dataset_filtered_no_outliers_img_info.csv"
 
 # 讀取必要欄位
 cols = ['flow_rate_class', 'feed_rate_class', 'z_offset_class', 'hotend_class']
