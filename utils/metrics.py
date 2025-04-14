@@ -174,8 +174,9 @@ def evaluate_model(model, test_generator, num_samples, threshold=0.5, save_path=
     # 計算分類報告
     try:
         report = classification_report(y_true_img, y_pred_img,
-                                     target_names=['正常', '錯誤'],
-                                     output_dict=True)
+                                      target_names=['正常', '錯誤'],
+                                      output_dict=True,
+                                      zero_division=0)
     except Exception as e:
         print(f"無法生成分類報告: {e}")
         report = {}
@@ -237,9 +238,11 @@ def plot_confusion_matrix(cm, class_names, save_path=None):
     cax = ax.matshow(cm, cmap=plt.cm.Blues)
     plt.colorbar(cax)
 
-    # 設置軸標籤
-    ax.set_xticklabels([''] + class_names, fontproperties=chinese_font)
-    ax.set_yticklabels([''] + class_names, fontproperties=chinese_font)
+    # 設置軸位置和標籤
+    ax.set_xticks(range(len(class_names)))
+    ax.set_yticks(range(len(class_names)))
+    ax.set_xticklabels(class_names, fontproperties=chinese_font)
+    ax.set_yticklabels(class_names, fontproperties=chinese_font)
 
     # 添加數值標籤
     for i in range(len(class_names)):
@@ -257,6 +260,7 @@ def plot_confusion_matrix(cm, class_names, save_path=None):
         print(f"混淆矩陣已保存至 {save_path}")
 
     plt.close()
+
 
 
 def visualize_predictions(model, test_generator, num_samples=10, threshold=0.5, save_dir=None):

@@ -124,7 +124,7 @@ def analyze_csv_data(csv_path, output_dir=None):
     if output_dir:
         plt.figure(figsize=(8, 6))
         plt.pie([normal_count, error_count],
-                labels=['正常', '錯誤'],
+                labels=['std', 'err'],
                 autopct='%1.1f%%',
                 colors=['#4CAF50', '#F44336'])
         plt.title('錯誤與正常樣本分佈', fontproperties=chinese_font)
