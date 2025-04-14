@@ -83,3 +83,5 @@ C:\Users\user\AppData\Local\Programs\PyCharm Professional 2024.3.1.1\plugins\pyt
 Corrupt JPEG data: 1 extraneous bytes before marker 0xd1
 Corrupt JPEG data: 1 extraneous bytes before marker 0xd5
 '''
+
+ pip install opencv-python pandas numpy matplotlib scikit-learn seaborn tqdm

@@ -17,7 +17,8 @@ from sklearn.metrics import (
 )
 
 from config.config import Config
-from models.unet import dice_coefficient, iou_coefficient
+from models.unet import dice_coef as dice_coefficient, iou_coef as iou_coefficient
+from models.unet import  dice_loss, combined_loss
 from utils.dataset import load_dataset_from_indices
 from utils.metrics import evaluate_model, visualize_predictions, compare_error_types
 from utils.visualization import (
@@ -38,10 +39,12 @@ def load_trained_model(model_path):
     """
     print(f"載入模型: {model_path}")
 
-    # 載入自定義指標
+    # 載入自定義指標和損失函數
     custom_objects = {
         'dice_coefficient': dice_coefficient,
-        'iou_coefficient': iou_coefficient
+        'iou_coefficient': iou_coefficient,
+        'dice_loss': dice_loss,
+        'combined_loss': combined_loss
     }
 
     try:
@@ -276,7 +279,7 @@ def evaluate_with_custom_csv(model, csv_path, image_dir, config, output_dir):
 
     plt.figure(figsize=(10, 8))
     plt.plot(fpr, tpr, color='darkorange', lw=2,
-             label=f'ROC曲線 (面積 = {roc_auc:.4f})')
+             label=f'ROC曲線 (面積 = {roc_auc:.4f})', fontproperties=chinese_font)
     plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
@@ -321,7 +324,7 @@ def evaluate_thresholds(model, val_generator, output_dir):
     # 繪製ROC曲線
     plt.figure(figsize=(10, 8))
     plt.plot(fpr, tpr, color='darkorange', lw=2,
-             label=f'ROC曲線 (面積 = {roc_auc:.4f})')
+             label=f'ROC曲線 (面積 = {roc_auc:.4f})', fontproperties=chinese_font)
     plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
@@ -410,18 +413,22 @@ def main():
     if args.threshold is not None:
         config.THRESHOLD = args.threshold
 
+    # 設置GPU記憶體增長 - 移至模型載入前
+    if config.GPU_MEMORY_GROWTH:
+        physical_devices = tf.config.list_physical_devices('GPU')
+        if len(physical_devices) > 0:
+            for device in physical_devices:
+                try:
+                    tf.config.experimental.set_memory_growth(device, True)
+                    print(f"已啟用GPU記憶體增長")
+                except Exception as e:
+                    print(f"設置GPU記憶體增長時發生錯誤: {e}")
+
     # 載入模型
     model = load_trained_model(args.model)
 
     # 建立輸出目錄
     os.makedirs(args.output, exist_ok=True)
-
-    # 設置GPU記憶體增長
-    if config.GPU_MEMORY_GROWTH:
-        physical_devices = tf.config.list_physical_devices('GPU')
-        if len(physical_devices) > 0:
-            for device in physical_devices:
-                tf.config.experimental.set_memory_growth(device, True)
 
     # 根據模式進行評估
     if args.mode == 'validation':

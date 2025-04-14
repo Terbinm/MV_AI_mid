@@ -11,6 +11,7 @@ import os
 import cv2
 from sklearn.metrics import confusion_matrix, classification_report
 
+from utils.font_utils import chinese_font
 
 def dice_coefficient(y_true, y_pred, smooth=1.0):
     """
@@ -237,8 +238,8 @@ def plot_confusion_matrix(cm, class_names, save_path=None):
     plt.colorbar(cax)
 
     # 設置軸標籤
-    ax.set_xticklabels([''] + class_names)
-    ax.set_yticklabels([''] + class_names)
+    ax.set_xticklabels([''] + class_names, fontproperties=chinese_font)
+    ax.set_yticklabels([''] + class_names, fontproperties=chinese_font)
 
     # 添加數值標籤
     for i in range(len(class_names)):
@@ -246,9 +247,9 @@ def plot_confusion_matrix(cm, class_names, save_path=None):
             ax.text(j, i, str(cm[i, j]), va='center', ha='center')
 
     # 設置標題和軸標籤
-    plt.title('混淆矩陣')
-    plt.xlabel('預測標籤')
-    plt.ylabel('真實標籤')
+    plt.title('混淆矩陣', fontproperties=chinese_font)
+    plt.xlabel('預測標籤', fontproperties=chinese_font)
+    plt.ylabel('真實標籤', fontproperties=chinese_font)
 
     # 保存圖像
     if save_path:
@@ -315,15 +316,15 @@ def visualize_predictions(model, test_generator, num_samples=10, threshold=0.5, 
         fig, axes = plt.subplots(2, 2, figsize=(12, 10))
 
         axes[0, 0].imshow(img)
-        axes[0, 0].set_title('原始影像')
+        axes[0, 0].set_title('原始影像', fontproperties=chinese_font)
         axes[0, 0].axis('off')
 
         axes[0, 1].imshow(true_mask, cmap='gray')
-        axes[0, 1].set_title('真實遮罩' + (' (有錯誤)' if true_mask.max() > 0 else ' (無錯誤)'))
+        axes[0, 1].set_title('真實遮罩' + (' (有錯誤)' if true_mask.max() > 0 else ' (無錯誤)'), fontproperties=chinese_font)
         axes[0, 1].axis('off')
 
         axes[1, 0].imshow(pred_mask, cmap='gray')
-        axes[1, 0].set_title(f'預測遮罩 (Dice={dice:.4f}, IoU={iou:.4f})')
+        axes[1, 0].set_title(f'預測遮罩 (Dice={dice:.4f}, IoU={iou:.4f})', fontproperties=chinese_font)
         axes[1, 0].axis('off')
 
         # 疊加效果：綠色表示預測錯誤，紅色表示真實錯誤
@@ -337,7 +338,7 @@ def visualize_predictions(model, test_generator, num_samples=10, threshold=0.5, 
         combined[pred_mask_bin > 0, 2] = combined[pred_mask_bin > 0, 2] * 0.5
 
         axes[1, 1].imshow(combined)
-        axes[1, 1].set_title('疊加效果 (紅:真實錯誤, 綠:預測錯誤)')
+        axes[1, 1].set_title('疊加效果 (紅:真實錯誤, 綠:預測錯誤)', fontproperties=chinese_font)
         axes[1, 1].axis('off')
 
         plt.tight_layout()
@@ -543,7 +544,7 @@ def compare_error_types(model, test_generator, num_samples=100, threshold=0.5, s
         ax.bar(x + width, precisions, width, label='Precision')
 
         ax.set_ylabel('Score')
-        ax.set_title('不同錯誤類型的檢測效果')
+        ax.set_title('不同錯誤類型的檢測效果', fontproperties=chinese_font)
         ax.set_xticks(x)
         ax.set_xticklabels(error_types, rotation=45, ha='right')
         ax.legend()

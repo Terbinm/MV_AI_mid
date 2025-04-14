@@ -16,11 +16,11 @@ import pandas as pd
 from tensorflow.keras.models import load_model
 
 from config.config import Config
-from models.unet import dice_coefficient, iou_coefficient
+from models.unet import dice_coef as dice_coefficient, iou_coef as iou_coefficient
 from utils.dataset import load_dataset_from_indices
 from utils.metrics import evaluate_model, visualize_predictions
 from utils.visualization import create_error_visualization_video
-
+from utils.font_utils import chinese_font
 
 def load_trained_model(model_path):
     """
@@ -395,15 +395,19 @@ def main():
     if args.threshold is not None:
         config.THRESHOLD = args.threshold
 
-    # 載入模型
-    model = load_trained_model(args.model)
-
-    # 設置GPU記憶體增長
+    # 設置GPU記憶體增長 - 移至模型載入前
     if config.GPU_MEMORY_GROWTH:
         physical_devices = tf.config.list_physical_devices('GPU')
         if len(physical_devices) > 0:
             for device in physical_devices:
-                tf.config.experimental.set_memory_growth(device, True)
+                try:
+                    tf.config.experimental.set_memory_growth(device, True)
+                    print(f"已啟用GPU記憶體增長")
+                except Exception as e:
+                    print(f"設置GPU記憶體增長時發生錯誤: {e}")
+
+    # 載入模型
+    model = load_trained_model(args.model)
 
     # 根據模式進行預測
     if args.mode == 'validation':
