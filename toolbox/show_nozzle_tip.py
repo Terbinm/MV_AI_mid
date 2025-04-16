@@ -2,8 +2,8 @@ import pandas as pd
 import os
 
 # === 使用者設定 ===
-csv_path = r'D:\led\MV_AI_mid\data\raw\caxton_dataset_filtered_no_outliers_img_info.csv'
-image_root = r'D:\led\MV_AI_mid\data\raw'  # 不包含 caxton_dataset
+csv_path = r'C:\led_code\MV_AI_mid_ssd\data\limited_data_size\caxton_dataset_filtered_no_outliers_img_info.csv'
+image_root = r'C:\led_code\MV_AI_mid_ssd\data\plt\nozzlp'  # 不包含 caxton_dataset
 
 # === 讀取 CSV 檔案 ===
 df = pd.read_csv(csv_path)

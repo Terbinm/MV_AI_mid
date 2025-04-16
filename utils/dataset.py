@@ -12,6 +12,7 @@ import albumentations as A
 from sklearn.model_selection import train_test_split
 
 
+
 class DatasetProcessor:
     """
     資料集處理器: 負責從大型CSV中讀取資料並處理
@@ -417,6 +418,80 @@ class PrintDataGenerator(Sequence):
         if self.is_training:
             np.random.shuffle(self.indices)
 
+class PrintDataGeneratorForClassification(PrintDataGenerator):
+    """
+    3D列印資料產生器的二元分類版本
+    與原版的主要區別是每個樣本返回單一標籤而非像素級標籤
+    """
+
+    def __getitem__(self, idx):
+        """獲取一個批次的資料，改為返回影像和單一標籤"""
+        batch_indices = self.indices[idx * self.batch_size:(idx + 1) * self.batch_size]
+        batch_images = []
+        batch_labels = []  # 單一標籤，而非遮罩
+
+        for index in batch_indices:
+            # 讀取影像和遮罩
+            img_path = os.path.join(self.image_dir, f"{index}.png")
+            mask_path = os.path.join(self.mask_dir, f"{index}.png")
+
+            img = cv2.imread(img_path)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+            mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+            # 計算單一標籤 - 如果遮罩中有任何像素大於127，則為錯誤樣本
+            label = 1.0 if np.mean(mask) > 0.5 else 0.0
+
+            # 資料增強
+            if self.is_training and self.transform:
+                # 對於分類任務，不需要同時轉換遮罩
+                transformed = self.transform(image=img)
+                img = transformed['image']
+
+            # 調整大小
+            img = cv2.resize(img, self.input_size)
+
+            # 正規化影像
+            if self.normalize:
+                img = img / 255.0
+
+            batch_images.append(img)
+            batch_labels.append(label)
+
+        # 轉換為NumPy陣列
+        X = np.array(batch_images)
+        y = np.array(batch_labels)  # 形狀為 (batch_size,)
+
+        return X, y
+
+def load_dataset_for_classification(processed_dir, indices_file, batch_size=8, is_training=True, input_size=(224, 224)):
+    """
+    從索引文件載入二元分類資料集
+
+    Args:
+        processed_dir: 預處理資料目錄
+        indices_file: 索引文件路徑
+        batch_size: 批次大小
+        is_training: 是否用於訓練
+        input_size: 輸入尺寸
+
+    Returns:
+        data_generator: 分類資料產生器
+    """
+    # 讀取索引
+    indices_df = pd.read_csv(indices_file)
+    indices = indices_df['index'].values
+
+    # 創建資料產生器
+    generator = PrintDataGeneratorForClassification(
+        image_dir=processed_dir,
+        indices=indices,
+        batch_size=batch_size,
+        is_training=is_training,
+        input_size=input_size
+    )
+
+    return generator
 
 def load_dataset_from_indices(processed_dir, indices_file, batch_size=8, is_training=True, input_size=(224, 224)):
     """
